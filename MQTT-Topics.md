@@ -9,7 +9,7 @@
 Tous les topics d'un contrôleur Moscata sont préfixés par son identifiant :
 
 ```text
-moscata/{deviceId}/...
+moscata/{controllerId}/...
 ```
 
 Exemple :
@@ -18,8 +18,8 @@ Exemple :
 moscata/abc123/status
 ```
 
-Le nom d'utilisateur MQTT d'un contrôleur est son `deviceId` : les ACL du
-broker (dépôt `moscata-mqtt`) en dépendent. Un `deviceId` ne doit contenir ni
+Le nom d'utilisateur MQTT d'un contrôleur est son `controllerId` : les ACL du
+broker (dépôt `moscata-mqtt`) en dépendent. Un `controllerId` ne doit contenir ni
 `/`, ni `+`, ni `#`.
 
 Les payloads sont encodés en **JSON UTF-8**.
@@ -30,12 +30,12 @@ Les payloads sont encodés en **JSON UTF-8**.
 
 | Topic | Direction | QoS | Retained | Description |
 |---|---|---|---|---|
-| `moscata/{deviceId}/status` | Moscata → Cloud | 1 | oui | Disponibilité et informations générales du contrôleur |
-| `moscata/{deviceId}/state` | Moscata → Cloud | 1 | oui | État courant des zones et périphériques |
-| `moscata/{deviceId}/telemetry` | Moscata → Cloud | 0 | non | Mesures des capteurs |
-| `moscata/{deviceId}/event` | Moscata → Cloud | 1 | non | Événements, alertes et résultats de commandes |
-| `moscata/{deviceId}/command` | Cloud → Moscata | 1 | non | Commandes envoyées au contrôleur |
-| `moscata/{deviceId}/config` | Cloud → Moscata | 1 | oui | Configuration du contrôleur |
+| `moscata/{controllerId}/status` | Moscata → Cloud | 1 | oui | Disponibilité et informations générales du contrôleur |
+| `moscata/{controllerId}/state` | Moscata → Cloud | 1 | oui | État courant des zones et périphériques |
+| `moscata/{controllerId}/telemetry` | Moscata → Cloud | 0 | non | Mesures des capteurs |
+| `moscata/{controllerId}/event` | Moscata → Cloud | 1 | non | Événements, alertes et résultats de commandes |
+| `moscata/{controllerId}/command` | Cloud → Moscata | 1 | non | Commandes envoyées au contrôleur |
+| `moscata/{controllerId}/config` | Cloud → Moscata | 1 | oui | Configuration du contrôleur |
 
 Les contrôleurs utilisent une session persistante : les messages QoS 1
 publiés pendant une déconnexion leur sont livrés à la reconnexion. C'est pour
@@ -230,7 +230,7 @@ Exemple :
 }
 ```
 
-Le `deviceId` désigne toujours le contrôleur (présent dans le topic) ; les capteurs sont identifiés par `sensorId`.
+Le `controllerId` désigne toujours le contrôleur (présent dans le topic) ; les capteurs sont identifiés par `sensorId`.
 
 ---
 

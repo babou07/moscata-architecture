@@ -32,7 +32,7 @@ nativement par GitHub et VS Code. Un fichier par domaine :
 |---|---|---|
 | **Contrôleur** | `Controller` | Un Moscata Modulo (ESP32-S3) installé sur site. C'est lui qui se connecte au broker MQTT. |
 | **Numéro de série** | `Controller.serialNumber` | Identifiant unique inscrit physiquement sur le contrôleur. **Fait foi.** Sert aussi d'identifiant MQTT (`controllerId`). |
-| **controllerId** | = `serialNumber` | Identifiant du contrôleur dans les topics (`moscata/{controllerId}/...`) et nom d'utilisateur MQTT. Sans `/`, `+` ni `#`. Appelé `deviceId` dans la version actuelle de `MQTT-Topics.md` (renommage proposé, voir plus bas). |
+| **controllerId** | = `serialNumber` | Identifiant du contrôleur dans les topics (`moscata/{controllerId}/...`) et nom d'utilisateur MQTT. Sans `/`, `+` ni `#`. Appelé `deviceId` jusqu'au 3 octobre 2026. |
 | **Device** | `Device` (à venir) | Un équipement piloté ou lu par un contrôleur : vanne, sonde, pompe. Même sens que dans le firmware et dans le champ `devices` du topic `config`. |
 | **Organisation** | `Organization` | Le compte client dans le cloud : exploitation, entreprise ou particulier. Peut avoir plusieurs contrôleurs. |
 | **Utilisateur** | `User` | Une personne qui se connecte à l'application web. |
@@ -82,11 +82,15 @@ nativement par GitHub et VS Code. Un fichier par domaine :
   suivante (peut-être jamais) : décalage **accepté**, le Moscata restant
   opérationnel sans cloud.
 
-**29 septembre 2026 : propositions (non actées).**
+**3 octobre 2026 : actée.**
 - Nommage : `Controller` pour le Moscata Modulo, `Device` pour vannes et
-  sondes (comme le firmware) ; renommer `deviceId` en **`controllerId`**
-  dans `../MQTT-Topics.md` et dans `moscata-mqtt` (documentation, scripts ;
-  les ACL utilisent le nom d'utilisateur MQTT, elles ne changent pas).
+  sondes (comme le firmware). `deviceId` est renommé **`controllerId`** dans
+  `../MQTT-Topics.md`, `moscata-mqtt` (documentation, scripts) et
+  `moscata-cloud-api` (documentation). Les ACL utilisent le nom
+  d'utilisateur MQTT : ni la configuration du broker ni les topics ne
+  changent.
+
+**29 septembre 2026 : propositions (non actées).**
 - **Numéro de série = `controllerId`** : un seul identifiant partout.
 - **Données cloisonnées par enrollment** : un nouveau propriétaire ne voit
   pas l'historique de l'ancien (voir `controleurs.md`).
@@ -128,7 +132,6 @@ nativement par GitHub et VS Code. Un fichier par domaine :
 ## Changements à prévoir dans le contrat MQTT
 
 À reporter dans `../MQTT-Topics.md` une fois validés avec le firmware :
-- renommage `deviceId` → `controllerId` ;
 - événement `factory.reset` (publié à la première connexion après un reset
   usine, ouvre la fenêtre de revendication) ;
 - `config` vide retained publié par l'API après un reset usine (efface la
