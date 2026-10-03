@@ -13,7 +13,8 @@ classDiagram
   direction LR
 
   class User {
-    identityProviderSubject
+    identityIssuer
+    identitySubject
     email
     displayName
     locale
@@ -92,10 +93,13 @@ celle d'un proche qu'il aide), et de zéro juste après son inscription.
   passées, audit).
 - **Authentification déléguée à un fournisseur OpenID Connect**
   (proposition) : inscription, vérification du mail, MFA, mot de passe
-  oublié, connexion Google/Apple. `identityProviderSubject` est
-  l'identifiant (`sub`) de l'utilisateur chez ce fournisseur ; **aucun mot
-  de passe utilisateur n'est stocké** dans notre base. Le choix du
-  fournisseur reste ouvert.
+  oublié, connexion Google/Apple. L'utilisateur est identifié par le couple
+  **(`identityIssuer`, `identitySubject`)**, c'est-à-dire l'émetteur du
+  jeton (`iss`) et l'identifiant de l'utilisateur chez lui (`sub`), unique
+  ensemble. Le `sub` seul ne suffit pas : deux fournisseurs peuvent émettre
+  le même, par exemple lors d'un changement de fournisseur. **Aucun mot de
+  passe utilisateur n'est stocké** dans notre base. Voir « Fournisseur
+  d'identité » ci-dessous.
 - Un utilisateur peut exister **sans abonnement** : l'inscription au cloud
   et l'abonnement sont distincts (voir `facturation.md`).
 
@@ -150,3 +154,42 @@ L'accès aux fonctions cloud dépend aussi de l'abonnement de l'organisation
 À implémenter dans **un seul service** de l'API, et non dispersée dans les
 requêtes : c'est ce qui permettra d'ajouter plus tard les délégations
 (`AccessGrant`) en ne modifiant qu'un endroit.
+
+## Fournisseur d'identité (proposition, 29 septembre 2026)
+
+L'API ne connaît **qu'un seul serveur d'identité OIDC**, qui propose
+lui-même les différentes méthodes de connexion (fédération). Elle vérifie
+les jetons en **OIDC standard** (clés publiques JWKS du serveur), sans SDK
+propre à un fournisseur, pour que le serveur reste **remplaçable**.
+
+Méthodes de connexion envisagées, activées dans le serveur d'identité sans
+toucher à l'API :
+
+| Méthode | Quand |
+|---|---|
+| Email + mot de passe, avec MFA (TOTP) | dès le départ |
+| Passkeys | dès le départ |
+| Google | dès le départ |
+| Apple | avec une éventuelle app iOS (exigé par Apple dès qu'une app propose une autre connexion tierce) |
+| Microsoft | si demande de clients professionnels |
+
+Serveurs d'identité envisagés :
+
+| Option | Hébergement | Remarques |
+|---|---|---|
+| **Zitadel** (piste privilégiée) | géré (Zitadel Cloud, région UE) ou auto-hébergé | léger, MFA, passkeys, fédération, notion d'organisations intégrée ; stocke ses données dans PostgreSQL ; même produit en géré et auto-hébergé, donc migration possible |
+| Keycloak | auto-hébergé, ou géré en France (Cloud-IAM) | référence du marché, très complet, mais lourd (Java, ~1 Go de RAM) |
+| Authentik | auto-hébergé | complet, plutôt orienté SSO d'entreprise |
+| Auth0, Clerk | géré, hors UE par défaut | simples, mais tarif par utilisateur actif et hébergement hors UE (RGPD) |
+
+Piste : **Zitadel Cloud en région UE** au départ. L'authentification est un
+service critique (sans elle, personne ne se connecte) et le géré évite de
+l'opérer sur un VPS unique ; retour possible en auto-hébergé plus tard.
+
+Questions ouvertes :
+- Zitadel Cloud ou auto-hébergé, ou un autre serveur ?
+- Méthodes de connexion activées au lancement.
+- Organisations : gérées dans notre base (modèle ci-dessus) ou aussi dans
+  le serveur d'identité ? Proposition : **dans notre base uniquement**, le
+  serveur d'identité ne gérant que l'identité des personnes ; on garde ainsi
+  la liberté d'en changer.

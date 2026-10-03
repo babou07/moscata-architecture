@@ -105,8 +105,8 @@ nativement par GitHub et VS Code. Un fichier par domaine :
 
 - **Fenêtre de revendication** après un reset usine : durée, et
   configuration du Wi-Fi après reset (relève du firmware).
-- **Fournisseur OpenID Connect** : auto-hébergé (Keycloak, Zitadel,
-  Authentik) ou géré (Auth0, Clerk…).
+- **Fournisseur OpenID Connect** : piste Zitadel (Cloud UE au départ),
+  options et méthodes de connexion détaillées dans `comptes.md`.
 - **Abonnement** : par organisation ou par contrôleur ? Tarifs, période
   d'essai, que se passe-t-il à l'échéance (données conservées combien de
   temps ?).
